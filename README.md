@@ -67,6 +67,9 @@ The GAE plugin defines the following convention properties in the `gae` closure:
 * `daemon`: Specifies whether the local development server should run in the background. When true, this task completes as
 soon as the server has started. When false, this task blocks until the local development server is stopped (defaults to false).
 * `warDir`: Web application directory used for local development server (defaults to `build/exploded-war`).
+* `disableUpdateCheck`: Disables the Google App Engine update check if set to true.
+* `debug`: Enables remote JVM debugging if set to true.
+* `debugPort`: The TCP port the JVM listens on for remote debug connections (defaults to 8000).
 
 Within `gae` you can define optional properties in a closure named `appcfg`:
 
