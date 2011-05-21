@@ -35,6 +35,8 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
     private File explodedWarDirectory
     private Boolean daemon
     private Boolean disableUpdateCheck
+    private Boolean debug
+    private Integer debugPort
     private final KickStartSynchronizer kickStartSynchronizer = new KickStartSynchronizer()
 
     @Override
@@ -79,8 +81,12 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
             ["com.google.appengine.tools.development.DevAppServerMain",
              "--port=" + getHttpPort(),
              getExplodedWarDirectory().getCanonicalPath()];
-        if (getDisableUpdateCheck()) {
+	   if (getDisableUpdateCheck()) {
             params.add(1,"--disable_update_check");
+        }
+        if (getDebug()) {
+		 params.add(0, "--jvm_flag=-Xdebug");
+		 params.add(1, "--jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address="+getDebugPort());
         }
         logger.info "Using params = $params"
         KickStart.main(params.toArray([] as String[]))
@@ -188,6 +194,22 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
 
     public void setDisableUpdateCheck(Boolean disableUpdateCheck) {
         this.disableUpdateCheck = disableUpdateCheck
+    }
+
+    public Boolean getDebug() {
+        debug
+    }
+
+    public void setDebug(Boolean debug) {
+        this.debug = debug
+    }
+
+    public Integer getDebugPort() {
+        debugPort
+    }
+
+    public void setDebugPort(Integer debugPort) {
+        this.debugPort= debugPort
     }
 
     public KickStartSynchronizer getKickStartSynchronizer() {
