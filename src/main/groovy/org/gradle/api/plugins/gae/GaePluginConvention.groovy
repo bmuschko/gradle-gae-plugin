@@ -28,6 +28,8 @@ class GaePluginConvention {
     String stopKey
     Boolean daemon = false
     Boolean disableUpdateCheck = false
+    Boolean debug = false
+    Integer debugPort = 8000
     File warDir
     GaeAppConfigConvention appCfg = new GaeAppConfigConvention()
 

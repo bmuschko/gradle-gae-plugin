@@ -79,6 +79,11 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
             ["com.google.appengine.tools.development.DevAppServerMain",
              "--port=" + getHttpPort(),
              getExplodedWarDirectory().getCanonicalPath()];
+	   if (getDebug()) {
+		  String jvmDebugger = "--jvm_flag=-Xdebug"
+		  jvmDebugger+=" --jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address="+getDebugPort();
+            params.add(1,jvmDebugger);
+        }
         if (getDisableUpdateCheck()) {
             params.add(1,"--disable_update_check");
         }
@@ -188,6 +193,22 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
 
     public void setDisableUpdateCheck(Boolean disableUpdateCheck) {
         this.disableUpdateCheck = disableUpdateCheck
+    }
+
+    public Boolean getDebug() {
+        debug
+    }
+
+    public void setDebug(Boolean debug) {
+        this.debug = debug
+    }
+
+    public Integer getDebugPort() {
+        debugPort
+    }
+
+    public void setDebugPort(Integer debugPort) {
+        this.debugPort= debugPort
     }
 
     public KickStartSynchronizer getKickStartSynchronizer() {
