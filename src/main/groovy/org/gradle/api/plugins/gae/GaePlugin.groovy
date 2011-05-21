@@ -121,6 +121,7 @@ class GaePlugin implements Plugin<Project> {
             gaeRunTask.conventionMapping.map("stopPort") { gaePluginConvention.stopPort }
             gaeRunTask.conventionMapping.map("stopKey") { gaePluginConvention.stopKey }
             gaeRunTask.conventionMapping.map("daemon") { gaePluginConvention.daemon }
+            gaeRunTask.conventionMapping.map("disableUpdateCheck") { gaePluginConvention.disableUpdateCheck }
             gaeRunTask.conventionMapping.map("explodedWarDirectory") { gaePluginConvention.warDir ? gaePluginConvention.warDir : explodedWarDirectory }
         }
 

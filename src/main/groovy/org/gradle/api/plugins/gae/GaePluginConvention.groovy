@@ -27,6 +27,7 @@ class GaePluginConvention {
     Integer stopPort = 8081
     String stopKey
     Boolean daemon = false
+    Boolean disableUpdateCheck = false
     File warDir
     GaeAppConfigConvention appCfg = new GaeAppConfigConvention()
 
