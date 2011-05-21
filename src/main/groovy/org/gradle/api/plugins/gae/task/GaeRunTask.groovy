@@ -35,6 +35,8 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
     private File explodedWarDirectory
     private Boolean daemon
     private Boolean disableUpdateCheck
+    private Boolean debug
+    private Integer debugPort
     private final KickStartSynchronizer kickStartSynchronizer = new KickStartSynchronizer()
 
     @Override
