@@ -81,13 +81,12 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
             ["com.google.appengine.tools.development.DevAppServerMain",
              "--port=" + getHttpPort(),
              getExplodedWarDirectory().getCanonicalPath()];
-	   if (getDebug()) {
-		  String jvmDebugger = "--jvm_flag=-Xdebug"
-		  jvmDebugger+=" --jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address="+getDebugPort();
-            params.add(1,jvmDebugger);
-        }
-        if (getDisableUpdateCheck()) {
+	   if (getDisableUpdateCheck()) {
             params.add(1,"--disable_update_check");
+        }
+        if (getDebug()) {
+		 params.add(0, "--jvm_flag=-Xdebug");
+		 params.add(1, "--jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address="+getDebugPort());
         }
         logger.info "Using params = $params"
         KickStart.main(params.toArray([] as String[]))
