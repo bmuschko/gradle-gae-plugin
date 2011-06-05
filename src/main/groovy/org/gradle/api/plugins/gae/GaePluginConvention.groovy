@@ -31,6 +31,7 @@ class GaePluginConvention {
     Boolean debug = false
     Integer debugPort = 8000
     File warDir
+    Boolean downloadSdk = false
     GaeAppConfigConvention appCfg = new GaeAppConfigConvention()
 
     def gae(Closure closure) {

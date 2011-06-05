@@ -28,7 +28,13 @@ download section or upload it to your local repository. The following code snipp
 
 *Note:* The plugin requires you to set the environment variable _APPENGINE_HOME_ or the system property _google.appengine.sdk_
 pointing to your current Google App Engine SDK installation. In case you have both variables set the system property takes
-precedence over the environment variable.
+precedence over the environment variable. Alternatively, you can choose to automatically download the SDK by setting the
+convention property `downloadSdk` to `true`. This option requires you to specify the SDK version you want to use by setting
+the configuration `gaeSdk`.
+
+    dependencies {
+        gaeSdk 'com.google.appengine:appengine-java-sdk:1.5.0.1'
+    }
 
 ## Tasks
 
@@ -68,6 +74,9 @@ soon as the server has started. When false, this task blocks until the local dev
 * `disableUpdateCheck`: Disables the Google App Engine update check if set to true.
 * `debug`: Enables remote JVM debugging if set to true.
 * `debugPort`: The TCP port the JVM listens on for remote debug connections (defaults to 8000).
+* `downloadSdk`: Downloads the Google App Engine SDK defined by the configuration name `gaeSdk` and explodes the artifact into
+`build/exploded-gae-sdk` (defaults to false). If set to `true` the given SDK is used for running all plugin tasks which
+takes precedence over _APPENGINE_HOME_ and the system property _google.appengine.sdk_.
 
 Within `gae` you can define optional properties in a closure named `appcfg`:
 
