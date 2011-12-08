@@ -320,6 +320,14 @@ class GaePlugin implements Plugin<Project> {
 				}
 							
 				eclipseClasspathTask.classpath.file.whenMerged { classpath ->
+					classpath.entries.removeAll { entry ->
+						entry.path.contains('com.google.appengine') && !entry.path.contains('appengine-testing')
+					}
+					
+					classpath.entries.find { entry ->
+						entry.kind == 'output'
+					}.path = "${project.webAppDirName}/WEB-INF/classes"
+					
 					// Copy all to WEB-INF/lib (for eclipse runtime)
 					classpath.entries.each { entry ->
 						if (entry.path.endsWith(".jar")) {
@@ -327,12 +335,6 @@ class GaePlugin implements Plugin<Project> {
 								fileset(file: entry.path)
 							}
 						}
-					}
-				}
-				
-				eclipseClasspathTask.classpath.file.whenMerged { classpath ->
-					classpath.entries.removeAll { entry ->
-						entry.path.contains('com.google.appengine') && !entry.path.contains('appengine-testing')
 					}
 				}
 			}
