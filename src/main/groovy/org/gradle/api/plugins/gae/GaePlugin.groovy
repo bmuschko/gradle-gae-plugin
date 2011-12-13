@@ -23,6 +23,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.gradle.api.plugins.gae.task.*
 import org.gradle.api.plugins.gae.task.appcfg.*
+import org.gradle.api.tasks.Copy;
+import org.gradle.plugins.ide.eclipse.EclipsePlugin;
+import org.gradle.plugins.ide.eclipse.GenerateEclipseClasspath;
+import org.gradle.plugins.ide.eclipse.GenerateEclipseProject;
 
 /**
  * <p>A {@link Plugin} that provides tasks for uploading, running and managing of Google App Engine projects.</p>
@@ -48,6 +52,7 @@ class GaePlugin implements Plugin<Project> {
     static final String GAE_LOGS = 'gaeLogs'
     static final String GAE_VERSION = 'gaeVersion'
     static final String GAE_EXPLODE_WAR = 'gaeExplodeWar'
+	static final String GAE_ECLIPSE_GEN_SETTINGS = 'gaeEclipseGenerateSettings'
     static final String GRADLE_USER_PROP_PASSWORD = 'gaePassword'
     static final String STOP_PORT_CONVENTION_PARAM = 'stopPort'
     static final String STOP_KEY_CONVENTION_PARAM = 'stopKey'
@@ -84,6 +89,7 @@ class GaePlugin implements Plugin<Project> {
         configureGaeDownloadLogs(project, gaePluginConvention)
         configureGaeVersion(project)
         configureGaeSdk(project, gaePluginConvention)
+		configureEclipseIntegration(project)
     }
 
     private File getExplodedSdkDirectory(Project project) {
@@ -291,4 +297,57 @@ class GaePlugin implements Plugin<Project> {
     private WarPluginConvention getWarConvention(Project project) {
         project.convention.getPlugin(WarPluginConvention.class)
     }
+	
+	private void configureEclipseIntegration(Project project) {		
+		project.tasks.withType(GenerateEclipseProject.class).whenTaskAdded { GenerateEclipseProject eclipsePlugin ->
+			eclipsePlugin.projectModel.natures << 'com.google.appengine.eclipse.core.gaeNature'
+			eclipsePlugin.projectModel.natures << 'com.google.gdt.eclipse.core.webAppNature'
+			eclipsePlugin.projectModel.buildCommands << [name: 'com.google.appengine.eclipse.core.enhancerbuilder']
+			eclipsePlugin.projectModel.buildCommands << [name: 'com.google.appengine.eclipse.core.projectValidator']
+		}
+		
+		GaeEclipseSettingsTask gaeEclipseSettingsTask = project.tasks.add(GAE_ECLIPSE_GEN_SETTINGS, GaeEclipseSettingsTask.class)
+		gaeEclipseSettingsTask.description = 'Generates GAE files for eclipse in the .settings directory'
+		gaeEclipseSettingsTask.group = GAE_GROUP
+		gaeEclipseSettingsTask.conventionMapping.map('explodedSdkDirectory') { getExplodedSdkDirectory(project) }
+		
+		project.afterEvaluate {
+			project.tasks.findAll { task -> task.name.equals('eclipseClasspath') }.each { eclipseClasspathTask ->
+				eclipseClasspathTask.classpath.file.withXml { xml ->
+					xml.asNode().appendNode('classpathentry', [kind: 'con', path: 'com.google.appengine.eclipse.core.GAE_CONTAINER'])
+	                            .appendNode('attributes')
+	                            .appendNode('attribute', [name: 'org.eclipse.jst.component.nondependency', value: "/${project.webAppDirName}/WEB-INF/lib"])
+				}
+							
+				eclipseClasspathTask.classpath.file.whenMerged { classpath ->
+					classpath.entries.removeAll { entry ->
+						entry.path.contains('com.google.appengine') && !entry.path.contains('appengine-testing')
+					}
+					
+					classpath.entries.find { entry ->
+						entry.kind == 'output'
+					}.path = "${project.webAppDirName}/WEB-INF/classes"
+					
+					// Copy all to WEB-INF/lib (for eclipse runtime)
+					classpath.entries.each { entry ->
+						if (entry.path.endsWith(".jar")) {
+							new AntBuilder().copy(todir: "${project.webAppDirName}/WEB-INF/lib") {
+								fileset(file: entry.path)
+							}
+						}
+					}
+				}
+			}
+			
+			project.tasks.findAll { task -> task.name.equals('eclipse') }.each { eclipseTask ->
+				eclipseTask.dependsOn gaeEclipseSettingsTask
+				
+				// Modify the WAR plugin - to ensure we don't get double in WEB-INF/lib & WEB-INF/classes (From Eclipse)
+				project.tasks.findAll { task -> task.name.equals('war') }.each { warTask ->
+					warTask.excludes << "WEB-INF/lib/*.jar"
+					warTask.excludes << "WEB-INF/classes/*"
+				}
+			}
+		}
+	}
 }

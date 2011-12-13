@@ -58,10 +58,12 @@ web application directory each time you run this task. This behavior can be chan
 * `gaeUpload`: Uploads files for an application given the application's root directory. The application ID and version are taken from the appengine-web.xml file.
 * `gaeVacuumIndexes`: Deletes unused indexes in App Engine server.
 * `gaeVersion`: Prints detailed version information about the SDK, Java and the operating system.
+* `gaeEclipseGenerateSettings`: Generates files to integrate with the Eclipse Google Plugin
 
 ## Project layout
 
 The GAE plugin uses the same layout as the War plugin.
+*Note:* If the Gradle Eclipse plugin is configured, the webAppDirName/WEB-INF/lib directory will also need to exist
 
 ## Convention properties
 
@@ -107,6 +109,16 @@ will be retrieved (defaults to 1 (INFO)).
 requested data, it does not guarantee the file won't contain duplicate error messages. If this argument is not specified,
 the plugin will overwrite the log output file.
 * `outputFile`: The file the logs get written to.
+
+### Integration with Gradle Eclipse Plugin / Google Plugin
+
+If this plugin is enabled on the same project that the eclipse plugin is, then executing 'gradle eclipse' will set up the project
+so that it will integrate nicely with the Google plugin for eclipse.  There are a few caveats due to this.
+
+* You will need to have a webAppDirName/WEB-INF/lib directory
+* Because the Google plugin expects the JARs to be in WEB-INF/lib, the 'gradle eclipse' task will copy the required files there
+* The Eclipse build output will also be in webAppDirName/WEB-INF/classes
+* Due to above, you likely should exclude those directory from version control
 
 ### Example
 
