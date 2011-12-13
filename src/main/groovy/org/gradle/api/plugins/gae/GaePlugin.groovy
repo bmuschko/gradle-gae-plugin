@@ -341,6 +341,12 @@ class GaePlugin implements Plugin<Project> {
 			
 			project.tasks.findAll { task -> task.name.equals('eclipse') }.each { eclipseTask ->
 				eclipseTask.dependsOn gaeEclipseSettingsTask
+				
+				// Modify the WAR plugin - to ensure we don't get double in WEB-INF/lib & WEB-INF/classes (From Eclipse)
+				project.tasks.findAll { task -> task.name.equals('war') }.each { warTask ->
+					warTask.excludes << "WEB-INF/lib/*.jar"
+					warTask.excludes << "WEB-INF/classes/*"
+				}
 			}
 		}
 	}
