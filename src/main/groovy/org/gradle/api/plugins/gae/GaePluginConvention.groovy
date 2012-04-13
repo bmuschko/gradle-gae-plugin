@@ -30,6 +30,7 @@ class GaePluginConvention {
     Boolean disableUpdateCheck = false
     Boolean debug = false
     Integer debugPort = 8000
+    List<String> jvmFlags = []
     File warDir
     Boolean downloadSdk = false
     GaeAppConfigConvention appCfg = new GaeAppConfigConvention()
