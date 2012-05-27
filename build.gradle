@@ -6,7 +6,7 @@ def compatibilityVersion = 1.5
 sourceCompatibility = compatibilityVersion
 targetCompatibility = compatibilityVersion
 group = 'org.gradle.api.plugins'
-version = '0.6.3'
+version = '0.7'
 
 repositories {
     mavenCentral()
@@ -15,6 +15,9 @@ repositories {
 dependencies {
     groovy fileTree(dir: new File(gradle.gradleHomeDir, 'lib'), includes: ['**/groovy-all-*.jar'])
     compile gradleApi()
+    compile 'eu.appsatori:gradle-fatjar-plugin:0.1.1', {
+        ext.optional = true
+    }
     testCompile 'org.spockframework:spock-core:0.6-groovy-1.8'
 }
 

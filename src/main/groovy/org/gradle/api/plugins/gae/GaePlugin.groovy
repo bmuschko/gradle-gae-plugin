@@ -18,17 +18,20 @@ package org.gradle.api.plugins.gae
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.plugins.UnknownPluginException
 import org.gradle.api.plugins.WarPlugin
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.plugins.gae.task.*
 import org.gradle.api.plugins.gae.task.appcfg.*
 import org.gradle.api.plugins.gae.task.appcfg.backends.*
+import groovy.util.logging.Slf4j
 
 /**
  * <p>A {@link Plugin} that provides tasks for uploading, running and managing of Google App Engine projects.</p>
  *
  * @author Benjamin Muschko
  */
+@Slf4j
 class GaePlugin implements Plugin<Project> {
     static final String GAE_SDK_CONFIGURATION_NAME = 'gaeSdk'
     static final String GAE_GROUP = 'Google App Engine'
@@ -68,20 +71,21 @@ class GaePlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.plugins.apply(WarPlugin)
+        applyFatJarPlugin(project)
 
         project.configurations.add(GAE_SDK_CONFIGURATION_NAME).setVisible(false).setTransitive(true)
                 .setDescription('The Google App Engine SDK to be downloaded and used for this project.')
 
         GaePluginConvention gaePluginConvention = new GaePluginConvention()
         project.convention.plugins.gae = gaePluginConvention
-
+        
         File explodedSdkDirectory = getExplodedSdkDirectory(project)
         File explodedWarDirectory = getExplodedWarDirectory(project)
         File downloadedAppDirectory = getDownloadedAppDirectory(project)
         configureDownloadSdk(project, explodedSdkDirectory)
         configureWebAppDir(project)
         configureAppConfig(project, gaePluginConvention)
-        configureGaeExplodeWarTask(project, explodedWarDirectory)
+        configureGaeExplodeWarTask(project, gaePluginConvention, explodedWarDirectory)
         configureGaeRun(project, gaePluginConvention, explodedWarDirectory)
         configureGaeStop(project, gaePluginConvention)
         configureGaeEnhance(project)
@@ -107,6 +111,20 @@ class GaePlugin implements Plugin<Project> {
         configureGaeDeleteBackend(project)
         configureGaeConfigureBackends(project)
         configureGaeUploadAll(project)
+    }
+
+    private void applyFatJarPlugin(Project project) {
+        try {
+            project.plugins.apply(ThirdPartyPlugin.FATJAR.id)
+
+            project.slimWar.doFirst {
+                File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+                project.ant.delete dir: new File(webAppDir, 'WEB-INF/lib')
+            }
+        }
+        catch(UnknownPluginException e) {
+            log.info 'FatJar plugin not installed.'
+        }
     }
 
     private File getExplodedSdkDirectory(Project project) {
@@ -136,7 +154,7 @@ class GaePlugin implements Plugin<Project> {
                     project.configurations.getByName(GAE_SDK_CONFIGURATION_NAME).singleFile
                 }
                 catch(IllegalStateException e) {
-                    // make "gradle -t" happy in case we don't declare configuration!
+                    // make "gradle tasks" happy in case we don't declare configuration!
                 }
             }
             gaeDownloadSdkTask.conventionMapping.map(EXPLODED_SDK_DIR_CONVENTION_PARAM) { explodedSdkDirectory }
@@ -168,16 +186,31 @@ class GaePlugin implements Plugin<Project> {
         }
     }
 
-    private void configureGaeExplodeWarTask(Project project, File explodedWarDirectory) {
+    private void configureGaeExplodeWarTask(Project project, GaePluginConvention gaePluginConvention, File explodedWarDirectory) {
         project.tasks.withType(GaeExplodeWarTask).whenTaskAdded { GaeExplodeWarTask gaeExplodeWarTask ->
-            gaeExplodeWarTask.conventionMapping.map('warArchive') { project.war.archivePath }
+            gaeExplodeWarTask.conventionMapping.map('warArchive') {
+                isWarOptimizationAllowed(project, gaePluginConvention) ? project.slimWar.archivePath : project.war.archivePath
+            }
             gaeExplodeWarTask.conventionMapping.map(EXPLODED_WAR_DIR_CONVENTION_PARAM) { explodedWarDirectory }
+            gaeExplodeWarTask.conventionMapping.map('cleanClasses') { isWarOptimizationAllowed(project, gaePluginConvention) }
         }
 
         GaeExplodeWarTask gaeExplodeWarTask = project.tasks.add(GAE_EXPLODE_WAR, GaeExplodeWarTask)
         gaeExplodeWarTask.description = 'Explodes WAR archive into directory.'
         gaeExplodeWarTask.group = GAE_GROUP
-        gaeExplodeWarTask.dependsOn project.war
+        
+        project.afterEvaluate {
+            if(isWarOptimizationAllowed(project, gaePluginConvention)) {
+                gaeExplodeWarTask.dependsOn project.slimWar
+            }
+            else {
+                gaeExplodeWarTask.dependsOn project.war
+            }
+        }
+    }
+
+    private boolean isWarOptimizationAllowed(Project project, GaePluginConvention gaePluginConvention) {
+        gaePluginConvention.optimizeWar && project.plugins.hasPlugin(ThirdPartyPlugin.FATJAR.id)
     }
 
     private void configureGaeRun(Project project, GaePluginConvention gaePluginConvention, File explodedWarDirectory) {

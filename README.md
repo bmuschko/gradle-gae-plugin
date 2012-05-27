@@ -88,6 +88,8 @@ soon as the server has started. When false, this task blocks until the local dev
 * `downloadSdk`: Downloads the Google App Engine SDK defined by the configuration name `gaeSdk` and explodes the artifact into
 `build/exploded-gae-sdk` (defaults to false). If set to `true` the given SDK is used for running all plugin tasks which
 takes precedence over _APPENGINE_HOME_ and the system property _google.appengine.sdk_.
+* `optimizeWar`: Specifies whether the generated classes and dependencies should be bundled into one single JAR file.
+The [Gradle FatJar Plugin](https://github.com/musketyr/gradle-fatjar-plugin/) must be applied to your project. Otherwise the flag has no effect.
 
 Within `gae` you can define optional properties in a closure named `appcfg`:
 
@@ -128,6 +130,7 @@ the plugin will overwrite the log output file.
 
     gae {
         httpPort = 8085
+        optimizeWar = true
 
         appcfg {
             email = 'benjamin.muschko@gmail.com'
