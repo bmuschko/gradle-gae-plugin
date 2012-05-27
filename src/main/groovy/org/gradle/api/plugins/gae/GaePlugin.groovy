@@ -15,6 +15,7 @@
  */
 package org.gradle.api.plugins.gae
 
+import groovy.util.logging.Slf4j
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -24,7 +25,6 @@ import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.plugins.gae.task.*
 import org.gradle.api.plugins.gae.task.appcfg.*
 import org.gradle.api.plugins.gae.task.appcfg.backends.*
-import groovy.util.logging.Slf4j
 
 /**
  * <p>A {@link Plugin} that provides tasks for uploading, running and managing of Google App Engine projects.</p>
