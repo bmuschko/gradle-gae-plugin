@@ -152,23 +152,10 @@ the plugin will overwrite the log output file.
 
 **Can I use the plugin with a [Gaelyk](http://gaelyk.appspot.com/) project?**
 
-Yes, you just have to configure the WAR plugin to point to the correct web application (by default `war`) and source code
-(by default `src`) directory. If you want to stick to the default source directory simply create the subdirectory `src/main/groovy`.
-
-    apply plugin: 'groovy'
-
-    sourceSets {
-        main {
-            groovy {
-                srcDirs = ['src']
-            }
-        }
-    }
-
-    webAppDirName = file('war')
-
+Yes, you just have to configure the `warDir` property to point to the correct web application (by default `src/main/webapp`). 
 When editing a Groovlets/Groovy templates in Gaelyk the server automatically deploys the change and you see it take effect almost instantly.
 The plugin provides support for that. Simply set the `warDir` convention property and leave the server running.
+    apply plugin: 'groovy'
 
     gae {
         warDir = file('war')
