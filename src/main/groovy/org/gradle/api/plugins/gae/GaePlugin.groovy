@@ -208,6 +208,9 @@ class GaePlugin implements Plugin<Project> {
         GaeExplodeWarTask gaeExplodeWarTask = project.tasks.add(GAE_EXPLODE_WAR, GaeExplodeWarTask)
         gaeExplodeWarTask.description = 'Explodes WAR archive into directory.'
         gaeExplodeWarTask.group = GAE_GROUP
+
+        // If WAR directory gets set we assume we have a fully functional web application, WAR creation/explosion is skipped
+        gaeExplodeWarTask.onlyIf { !gaePluginConvention.warDir }
         
         project.afterEvaluate {
             if(isWarOptimizationAllowed(project, gaePluginConvention)) {
@@ -238,12 +241,7 @@ class GaePlugin implements Plugin<Project> {
         gaeRunTask.description = 'Starts up a local App Engine development server.'
         gaeRunTask.group = GAE_GROUP
 
-        project.afterEvaluate {
-            // If WAR directory gets set we assume we have a fully functional web application, WAR creation/explosion is skipped
-            if(!gaePluginConvention.warDir) {
-                gaeRunTask.dependsOn project.tasks.getByName(GAE_EXPLODE_WAR)
-            }
-        }
+        gaeRunTask.dependsOn project.tasks.getByName(GAE_EXPLODE_WAR)
     }
 
     private void configureGaeStop(Project project, GaePluginConvention gaePluginConvention) {
