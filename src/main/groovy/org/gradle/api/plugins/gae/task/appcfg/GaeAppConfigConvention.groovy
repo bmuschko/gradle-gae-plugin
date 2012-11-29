@@ -28,6 +28,7 @@ class GaeAppConfigConvention {
     String password
     String httpProxy
     String httpsProxy
+    Boolean changing
     GaeDownloadLogsConvention logs = new GaeDownloadLogsConvention()
     GaeDownloadAppConvention app = new GaeDownloadAppConvention()
 }

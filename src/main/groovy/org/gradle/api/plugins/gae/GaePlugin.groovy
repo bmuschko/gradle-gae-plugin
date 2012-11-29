@@ -195,6 +195,7 @@ class GaePlugin implements Plugin<Project> {
             }
             gaeAppConfigTaskTemplate.conventionMapping.map('httpProxy') { gaePluginConvention.appCfg.httpProxy }
             gaeAppConfigTaskTemplate.conventionMapping.map('httpsProxy') { gaePluginConvention.appCfg.httpsProxy }
+            gaeAppConfigTaskTemplate.conventionMapping.map('changing') { gaePluginConvention.appCfg.changing }
         }
     }
 

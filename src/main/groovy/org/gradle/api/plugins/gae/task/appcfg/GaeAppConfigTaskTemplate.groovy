@@ -33,6 +33,7 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask {
     String password
     String httpProxy
     String httpsProxy
+    Boolean changing
 
     @Override
     void executeTask() {
