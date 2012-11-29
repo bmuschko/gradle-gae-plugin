@@ -32,6 +32,7 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
     Integer stopPort
     String stopKey
     File explodedWarDirectory
+    File warDirectory
     Boolean daemon
     Boolean disableUpdateCheck
     List<String> jvmFlags
@@ -98,7 +99,7 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
         kickStartParams.httpPort = getHttpPort()
         kickStartParams.disableUpdateCheck = getDisableUpdateCheck()
         kickStartParams.jvmFlags = getJvmFlags()
-        kickStartParams.explodedWarDirectory = getExplodedWarDirectory()
+        kickStartParams.explodedWarDirectory = getWarDirForKickStart()
 
         List<String> params = KickStartParamsBuilder.instance.buildCommandLineParams(kickStartParams)
         log.info "Using params = $params"
@@ -106,6 +107,10 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
         ClassLoader classLoader = Thread.currentThread().contextClassLoader
         Class kickStart = Class.forName('com.google.appengine.tools.KickStart', true, classLoader)
         kickStart.main(params as String[])
+    }
+    
+    File getWarDirForKickStart(){
+        getWarDirectory() ?: getExplodedWarDirectory()
     }
 
     @Slf4j

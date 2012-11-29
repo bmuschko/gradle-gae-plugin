@@ -186,10 +186,7 @@ class GaePlugin implements Plugin<Project> {
     
     private void configureExplodedWarDir(Project project, File explodedWarDirectory) {
         project.tasks.matching{ Task task ->
-            println "Matching $task.name"
-            println "hasProperty: ${task.hasProperty(EXPLODED_WAR_DIR_CONVENTION_PARAM)}"
-            println "hasProperty (over metaclass): ${task.metaClass.hasProperty(EXPLODED_WAR_DIR_CONVENTION_PARAM)}"
-            task.hasProperty(EXPLODED_WAR_DIR_CONVENTION_PARAM) && !(task instanceof GaeRunTask)
+            task instanceof Explodable
         }.whenTaskAdded { Task task ->
             task.conventionMapping.map(EXPLODED_WAR_DIR_CONVENTION_PARAM) { explodedWarDirectory }
         }
@@ -245,7 +242,7 @@ class GaePlugin implements Plugin<Project> {
             gaeRunTask.conventionMapping.map('daemon') { gaePluginConvention.daemon }
             gaeRunTask.conventionMapping.map('disableUpdateCheck') { gaePluginConvention.disableUpdateCheck }
             gaeRunTask.conventionMapping.map('jvmFlags') { gaePluginConvention.jvmFlags }
-            gaeRunTask.conventionMapping.map(EXPLODED_WAR_DIR_CONVENTION_PARAM) { gaePluginConvention.warDir ?: explodedWarDirectory }
+            gaeRunTask.conventionMapping.map('warDirectory') { gaePluginConvention.warDir }
         }
 
         GaeRunTask gaeRunTask = project.tasks.add(GAE_RUN, GaeRunTask)
