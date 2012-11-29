@@ -19,6 +19,7 @@ import org.gradle.api.plugins.gae.task.Explodable
 import org.gradle.api.plugins.gae.task.appcfg.GaeAppConfigTaskTemplate
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.TaskInputs;
 
 /**
  * Google App Engine task updating backend on the server.
@@ -26,10 +27,9 @@ import org.gradle.api.tasks.InputDirectory
  * @see <a href="https://developers.google.com/appengine/docs/java/backends/overview?hl=cs#Commands">Documentation</a>
  * @author Benjamin Muschko
  */
-class GaeUpdateBackendTask extends GaeAppConfigTaskTemplate implements Explodable {
+class GaeUpdateBackendTask extends GaeAppConfigTaskTemplate {
     static final String COMMAND = 'update'
     @Input String backend
-    @InputDirectory File explodedWarDirectory
 
     @Override
     String startLogMessage() {
@@ -50,4 +50,12 @@ class GaeUpdateBackendTask extends GaeAppConfigTaskTemplate implements Explodabl
     List getParams() {
         [AbstractGaeBackendsTask.COMMAND, getExplodedWarDirectory().canonicalPath, COMMAND, getBackend()]
     }
+    
+    @Override
+    public TaskInputs getInputs() {
+        TaskInputs inputs = super.inputs
+        inputs.dir(getExplodedWarDirectory())
+        inputs
+    }
+    
 }

@@ -41,7 +41,7 @@ class GaeUpdateQueuesTask extends GaeAppConfigTaskTemplate {
 
     @Override
     List getParams() {
-        [COMMAND, getWebAppSourceDirectory().canonicalPath]
+        [COMMAND, getEffectiveWarDirectory().canonicalPath]
     }
 }
 

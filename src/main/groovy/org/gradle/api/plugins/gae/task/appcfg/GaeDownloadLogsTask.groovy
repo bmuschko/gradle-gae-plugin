@@ -76,7 +76,7 @@ class GaeDownloadLogsTask extends GaeAppConfigTaskTemplate {
         }
 
         params << COMMAND
-        params << getWebAppSourceDirectory().canonicalPath
+        params << getEffectiveWarDirectory().canonicalPath
         params << getOutputFile().canonicalFile
         params
     }

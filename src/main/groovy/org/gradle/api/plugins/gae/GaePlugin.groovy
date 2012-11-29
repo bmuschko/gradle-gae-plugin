@@ -205,6 +205,14 @@ class GaePlugin implements Plugin<Project> {
             gaeAppConfigTaskTemplate.conventionMapping.map('httpProxy') { gaePluginConvention.appCfg.httpProxy }
             gaeAppConfigTaskTemplate.conventionMapping.map('httpsProxy') { gaePluginConvention.appCfg.httpsProxy }
             gaeAppConfigTaskTemplate.conventionMapping.map('changing') { gaePluginConvention.appCfg.changing }
+            project.afterEvaluate {
+                if(gaePluginConvention.appCfg.changing){
+                    log.debug "Task $gaeAppConfigTaskTemplate.name will depend on gaeExplodeWar"
+                    gaeAppConfigTaskTemplate.dependsOn 'gaeExplodeWar'
+                } else {
+                    log.debug "Task $gaeAppConfigTaskTemplate.name will not depend on gaeExplodeWar"
+                }
+            }
         }
     }
 
