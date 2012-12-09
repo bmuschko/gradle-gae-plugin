@@ -129,6 +129,10 @@ requested data, it does not guarantee the file won't contain duplicate error mes
 the plugin will overwrite the log output file.
 * `outputFile`: The file the logs get written to.
 
+The task `gaeUpdate` allows you to specify that you want to upload a Java 7-compatible application:
+
+* `useJava7`: Java 7 compatibility flag (default to `false` if not set).
+
 ### Example
 
     gae {
