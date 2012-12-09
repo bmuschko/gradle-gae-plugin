@@ -15,7 +15,6 @@
  */
 package org.gradle.api.plugins.gae
 
-import groovy.util.logging.Slf4j
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -39,7 +38,6 @@ import static org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
  *
  * @author Benjamin Muschko
  */
-@Slf4j
 class GaePlugin implements Plugin<Project> {
     static final String GAE_SDK_CONFIGURATION_NAME = 'gaeSdk'
     static final String GAE_GROUP = 'Google App Engine'
@@ -136,7 +134,7 @@ class GaePlugin implements Plugin<Project> {
             }
         }
         catch(UnknownPluginException e) {
-            log.info 'FatJar plugin not installed.'
+            project.logger.info 'FatJar plugin not installed.'
         }
     }
 
