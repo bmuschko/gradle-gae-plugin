@@ -129,7 +129,7 @@ requested data, it does not guarantee the file won't contain duplicate error mes
 the plugin will overwrite the log output file.
 * `outputFile`: The file the logs get written to.
 
-The task `gaeUpdate` allows you to specify that you want to upload a Java 7-compatible application:
+The task `gaeUpdate` allows you to specify upload specific settings. Define the tasks' properties in the closure `update`:
 
 * `useJava7`: Java 7 compatibility flag (default to `false` if not set). This feature will require a App Engine SDK of >= 1.7.3.
 
