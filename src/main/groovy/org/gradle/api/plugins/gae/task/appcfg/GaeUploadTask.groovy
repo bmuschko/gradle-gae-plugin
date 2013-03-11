@@ -47,11 +47,4 @@ class GaeUploadTask extends GaeAppConfigTaskTemplate {
     List getParams() {
         ['--enable_jar_splitting', COMMAND, getExplodedWarDirectory().canonicalPath]
     }
-    
-    @Override
-    public TaskInputs getInputs() {
-        TaskInputs inputs = super.inputs
-        inputs.dir(getExplodedWarDirectory())
-        inputs
-    }
 }

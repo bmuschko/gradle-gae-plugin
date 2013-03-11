@@ -51,11 +51,4 @@ class GaeUpdateBackendTask extends GaeAppConfigTaskTemplate {
         [AbstractGaeBackendsTask.COMMAND, getExplodedWarDirectory().canonicalPath, COMMAND, getBackend()]
     }
     
-    @Override
-    public TaskInputs getInputs() {
-        TaskInputs inputs = super.inputs
-        inputs.dir(getExplodedWarDirectory())
-        inputs
-    }
-    
 }

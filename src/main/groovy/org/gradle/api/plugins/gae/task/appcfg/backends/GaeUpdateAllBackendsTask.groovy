@@ -48,11 +48,4 @@ class GaeUpdateAllBackendsTask extends GaeAppConfigTaskTemplate {
     List getParams() {
         [AbstractGaeBackendsTask.COMMAND, getExplodedWarDirectory().canonicalPath, COMMAND]
     }
-    
-    @Override
-    public TaskInputs getInputs() {
-        TaskInputs inputs = super.inputs
-        inputs.dir(getExplodedWarDirectory())            
-        inputs
-    }
 }

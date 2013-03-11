@@ -173,8 +173,8 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask implements Expl
     
     @Override
     public TaskInputs getInputs() {
-        TaskInputs inputs = super.inputs
-        if(changing){
+        TaskInputs inputs = super.getInputs()
+        if(getChanging()){
             inputs.dir(getExplodedWarDirectory())
         }
         inputs
