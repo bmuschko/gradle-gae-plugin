@@ -108,13 +108,14 @@ convention property was provided also. Alternatively, you can set the password i
 * `httpsProxy`: Use the given HTTPS proxy to contact App Engine, when using HTTPS. If `httpProxy` is given but `httpsProxy`
 is not, both HTTP and HTTPS requests will use the given proxy.
 * `oauth2`: Use OAuth2 authentication instead of password-based authentication.
+* `id`: The application ID - (defaults to the id specified in appengine-web.xml or app.yaml).
+* `version`: The current application version (defaults to the version specified in appengine-web.xml or app.yaml).
 
 The task `gaeDownloadApp` requires you to at least define the application ID and directory to write the files to. Define the tasks' properties in the
-closure `app`:
+closure `download`:
 
-* `id`: The application ID.
-* `version`: The current application version (defaults to current default version).
-* `outputDirectory`: The directory where you wish to save the files (defaults to `build/downloaded-app`).
+* `outputDirectory`: The directory where you wish to save the files (defaults to `build/downloaded-app`).  You must also set the `id` property within `appcfg`, 
+you may optionally set `version` within `appcfg`.
 
 The task `gaeLogs` requires you to at least define the file to write the logs to. Define the tasks' properties in the
 closure `logs`:

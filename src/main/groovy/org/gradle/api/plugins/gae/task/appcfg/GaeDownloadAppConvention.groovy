@@ -21,7 +21,5 @@ package org.gradle.api.plugins.gae.task.appcfg
  * @author Benjamin Muschko
  */
 class GaeDownloadAppConvention {
-    String id
-    String version
     File outputDirectory
 }

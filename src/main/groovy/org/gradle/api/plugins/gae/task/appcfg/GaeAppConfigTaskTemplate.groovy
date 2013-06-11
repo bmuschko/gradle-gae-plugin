@@ -33,6 +33,8 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask {
     String httpProxy
     String httpsProxy
     Boolean oauth2
+    String id
+    String version
 
     @Override
     void executeTask() {
@@ -105,7 +107,12 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask {
         if(getOauth2()) {
             params << '--oauth2'
         }
-
+        if(getId()) {
+            params << "--application=${getId()}"
+        }        
+        if(getVersion()) {
+            params << "--version=${getVersion()}"
+        }
     }
 
     private class AppConfigRunnable implements Runnable {
