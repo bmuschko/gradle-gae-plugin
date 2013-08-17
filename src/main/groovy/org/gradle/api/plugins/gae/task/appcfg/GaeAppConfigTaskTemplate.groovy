@@ -15,15 +15,22 @@
  */
 package org.gradle.api.plugins.gae.task.appcfg
 
+import java.io.File;
+
+import groovy.util.logging.Slf4j
 import org.gradle.api.GradleException
+import org.gradle.api.plugins.gae.task.Explodable;
 import org.gradle.api.plugins.gae.task.GaeWebAppDirTask
+import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.TaskInputs;
 
 /**
  * Abstract Google App Engine task used for application configuration.
  *
  * @author Benjamin Muschko
  */
-abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask {
+@Slf4j
+abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask implements Explodable {
     String email
     String server
     String host
@@ -32,6 +39,8 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask {
     String password
     String httpProxy
     String httpsProxy
+    Boolean changing
+    File explodedWarDirectory
     Boolean oauth2
 
     @Override
@@ -46,6 +55,10 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask {
             appConfigThread.start()
             appConfigThread.join()
         }
+    }
+    
+    File getEffectiveWarDirectory(){
+        getChanging() ? getExplodedWarDirectory() : getWebAppSourceDirectory()
     }
 
     private boolean requiresUserInput() {
@@ -168,4 +181,13 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask {
     abstract String errorLogMessage()
     abstract String finishLogMessage()
     abstract List getParams()
+    
+    @Override
+    public TaskInputs getInputs() {
+        TaskInputs inputs = super.getInputs()
+        if(getChanging()){
+            inputs.dir(getExplodedWarDirectory())
+        }
+        inputs
+    }
 }

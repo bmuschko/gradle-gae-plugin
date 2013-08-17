@@ -108,8 +108,8 @@ convention property was provided also. Alternatively, you can set the password i
 * `httpProxy`: Use the given HTTP proxy to contact App Engine.
 * `httpsProxy`: Use the given HTTPS proxy to contact App Engine, when using HTTPS. If `httpProxy` is given but `httpsProxy`
 is not, both HTTP and HTTPS requests will use the given proxy.
+* `changing` : notifies plugin that `appengine-web.xml` file may be modified during the build process
 * `oauth2`: Use OAuth2 authentication instead of password-based authentication.
-
 The task `gaeDownloadApp` requires you to at least define the application ID and directory to write the files to. Define the tasks' properties in the
 closure `app`:
 

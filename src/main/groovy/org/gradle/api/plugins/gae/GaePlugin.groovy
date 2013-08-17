@@ -94,8 +94,9 @@ class GaePlugin implements Plugin<Project> {
         File downloadedAppDirectory = getDownloadedAppDirectory(project)
         configureDownloadSdk(project, explodedSdkDirectory)
         configureWebAppDir(project)
+        configureExplodedWarDir(project, explodedWarDirectory)
         configureAppConfig(project, gaePluginConvention)
-        configureGaeExplodeWarTask(project, gaePluginConvention, explodedWarDirectory)
+        configureGaeExplodeWarTask(project, gaePluginConvention)
         configureGaeRun(project, gaePluginConvention, explodedWarDirectory)
         configureGaeStop(project, gaePluginConvention)
         configureGaeEnhance(project)
@@ -112,8 +113,8 @@ class GaePlugin implements Plugin<Project> {
         configureGaeDownloadApplication(project, gaePluginConvention, downloadedAppDirectory)
         configureGaeSdk(project, gaePluginConvention)
         configureGaeSingleBackendTask(project)
-        configureGaeUpdateBackends(project, explodedWarDirectory)
-        configureGaeUpdateAllBackends(project, explodedWarDirectory)
+        configureGaeUpdateBackends(project)
+        configureGaeUpdateAllBackends(project)
         configureGaeRollbackBackends(project)
         configureGaeListBackends(project)
         configureGaeStartBackend(project)
@@ -181,6 +182,14 @@ class GaePlugin implements Plugin<Project> {
             gaeWebAppDirTask.conventionMapping.map('webAppSourceDirectory') { getWarConvention(project).webAppDir }
         }
     }
+    
+    private void configureExplodedWarDir(Project project, File explodedWarDirectory) {
+        project.tasks.matching{ Task task ->
+            task instanceof Explodable
+        }.whenTaskAdded { Task task ->
+            task.conventionMapping.map(EXPLODED_WAR_DIR_CONVENTION_PARAM) { explodedWarDirectory }
+        }
+    }
 
     private void configureAppConfig(Project project, GaePluginConvention gaePluginConvention) {
         project.tasks.withType(GaeAppConfigTaskTemplate).whenTaskAdded { GaeAppConfigTaskTemplate gaeAppConfigTaskTemplate ->
@@ -196,15 +205,23 @@ class GaePlugin implements Plugin<Project> {
             gaeAppConfigTaskTemplate.conventionMapping.map('httpProxy') { gaePluginConvention.appCfg.httpProxy }
             gaeAppConfigTaskTemplate.conventionMapping.map('httpsProxy') { gaePluginConvention.appCfg.httpsProxy }
             gaeAppConfigTaskTemplate.conventionMapping.map('oauth2') { gaePluginConvention.appCfg.oauth2 }
+            gaeAppConfigTaskTemplate.conventionMapping.map('changing') { gaePluginConvention.appCfg.changing }
+            project.afterEvaluate {
+                if(gaePluginConvention.appCfg.changing){
+                    log.debug "Task $gaeAppConfigTaskTemplate.name will depend on gaeExplodeWar"
+                    gaeAppConfigTaskTemplate.dependsOn 'gaeExplodeWar'
+                } else {
+                    log.debug "Task $gaeAppConfigTaskTemplate.name will not depend on gaeExplodeWar"
+                }
+            }
         }
     }
 
-    private void configureGaeExplodeWarTask(Project project, GaePluginConvention gaePluginConvention, File explodedWarDirectory) {
+    private void configureGaeExplodeWarTask(Project project, GaePluginConvention gaePluginConvention) {
         project.tasks.withType(GaeExplodeWarTask).whenTaskAdded { GaeExplodeWarTask gaeExplodeWarTask ->
             gaeExplodeWarTask.conventionMapping.map('warArchive') {
                 isWarOptimizationAllowed(project, gaePluginConvention) ? project.slimWar.archivePath : project.war.archivePath
             }
-            gaeExplodeWarTask.conventionMapping.map(EXPLODED_WAR_DIR_CONVENTION_PARAM) { explodedWarDirectory }
             gaeExplodeWarTask.conventionMapping.map('cleanClasses') { isWarOptimizationAllowed(project, gaePluginConvention) }
         }
 
@@ -235,7 +252,7 @@ class GaePlugin implements Plugin<Project> {
             gaeRunTask.conventionMapping.map('daemon') { gaePluginConvention.daemon }
             gaeRunTask.conventionMapping.map('disableUpdateCheck') { gaePluginConvention.disableUpdateCheck }
             gaeRunTask.conventionMapping.map('jvmFlags') { gaePluginConvention.jvmFlags }
-            gaeRunTask.conventionMapping.map(EXPLODED_WAR_DIR_CONVENTION_PARAM) { gaePluginConvention.warDir ?: explodedWarDirectory }
+            gaeRunTask.conventionMapping.map('warDirectory') { gaePluginConvention.warDir }
         }
 
         GaeRunTask gaeRunTask = project.tasks.add(GAE_RUN, GaeRunTask)
@@ -274,15 +291,16 @@ class GaePlugin implements Plugin<Project> {
         }
     }
 
+
     private void configureGaeUpdate(Project project, GaePluginConvention gaePluginConvention, File explodedWarDirectory) {
         project.tasks.withType(GaeUpdateTask).whenTaskAdded { GaeUpdateTask gaeUpdateTask ->
             gaeUpdateTask.conventionMapping.map(EXPLODED_WAR_DIR_CONVENTION_PARAM) { explodedWarDirectory }
             gaeUpdateTask.conventionMapping.map('useJava7') { gaePluginConvention.appCfg.update.useJava7 }
         }
 
-        GaeUpdateTask gaeUpdateTask = project.tasks.add(GAE_UPDATE, GaeUpdateTask)
-        gaeUpdateTask.description = 'Updates your application on App Engine.'
-        gaeUpdateTask.group = GAE_GROUP
+        GaeUpdateTask gaeUploadTask = project.tasks.add(GAE_UPLOAD, GaeUploadTask)
+        gaeUploadTask.description = 'Uploads your application to App Engine.'
+        gaeUploadTask.group = GAE_GROUP
         gaeUpdateTask.dependsOn project.gaeExplodeWar
     }
 
@@ -378,20 +396,18 @@ class GaePlugin implements Plugin<Project> {
         }
     }
 
-    private void configureGaeUpdateBackends(Project project, File explodedWarDirectory) {
+    private void configureGaeUpdateBackends(Project project) {
         GaeUpdateBackendTask gaeUpdateBackendsTask = project.tasks.add(GAE_UPDATE_BACKEND, GaeUpdateBackendTask)
         gaeUpdateBackendsTask.description = 'Updates backend on App Engine.'
         gaeUpdateBackendsTask.group = GAE_GROUP
         gaeUpdateBackendsTask.conventionMapping.map('backend') { project.property(BACKEND_PROJECT_PROPERTY) }
-        gaeUpdateBackendsTask.conventionMapping.map(EXPLODED_WAR_DIR_CONVENTION_PARAM) { explodedWarDirectory }
         gaeUpdateBackendsTask.dependsOn project.gaeExplodeWar
     }
 
-    private void configureGaeUpdateAllBackends(Project project, File explodedWarDirectory) {
+    private void configureGaeUpdateAllBackends(Project project) {
         GaeUpdateAllBackendsTask gaeUpdateAllBackendsTask = project.tasks.add(GAE_UPDATE_ALL_BACKENDS, GaeUpdateAllBackendsTask)
         gaeUpdateAllBackendsTask.description = 'Updates all backends on App Engine.'
         gaeUpdateAllBackendsTask.group = GAE_GROUP
-        gaeUpdateAllBackendsTask.conventionMapping.map(EXPLODED_WAR_DIR_CONVENTION_PARAM) { explodedWarDirectory }
         gaeUpdateAllBackendsTask.dependsOn project.gaeExplodeWar
     }
 

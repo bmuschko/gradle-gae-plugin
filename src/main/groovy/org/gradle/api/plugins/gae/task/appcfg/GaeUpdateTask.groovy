@@ -17,6 +17,7 @@ package org.gradle.api.plugins.gae.task.appcfg
 
 import org.gradle.api.plugins.gae.task.Explodable
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.TaskInputs;
 
 /**
  * Google App Engine task updating your application on the server.
