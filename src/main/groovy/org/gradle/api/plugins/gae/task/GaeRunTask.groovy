@@ -15,7 +15,6 @@
  */
 package org.gradle.api.plugins.gae.task
 
-import groovy.util.logging.Slf4j
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.plugins.gae.task.internal.*
@@ -26,8 +25,8 @@ import org.gradle.api.plugins.gae.task.internal.*
  * @see <a href="http://code.google.com/appengine/docs/java/tools/devserver.html#Running_the_Development_Web_Server">Documentation</a>
  * @author Benjamin Muschko
  */
-@Slf4j
 class GaeRunTask extends AbstractGaeTask implements Explodable {
+    String httpAddress
     Integer httpPort
     Integer stopPort
     String stopKey
@@ -54,7 +53,7 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
             throw new InvalidUserDataException("$type port number already in use: $port")
         }
 
-        log.info "$type port = $port"
+        logger.info "$type port = $port"
     }
 
     @Override
@@ -64,7 +63,7 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
 
     private void startLocalDevelopmentServer() {
         try {
-            log.info 'Starting local development server...'
+            logger.info 'Starting local development server...'
 
             if(!getDaemon()) {
                 startShutdownMonitor(new SystemExitShutdownCallback())
@@ -84,7 +83,7 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
         }
         finally {
             if(!getDaemon()) {
-                log.info 'Local development server exiting.'
+                logger.info 'Local development server exiting.'
             }
         }
     }
@@ -97,12 +96,13 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
     private void runKickStart() {
         KickStartParams kickStartParams = new KickStartParams()
         kickStartParams.httpPort = getHttpPort()
+        kickStartParams.httpAddress = getHttpAddress()
         kickStartParams.disableUpdateCheck = getDisableUpdateCheck()
         kickStartParams.jvmFlags = getJvmFlags()
         kickStartParams.explodedWarDirectory = getWarDirForKickStart()
 
         List<String> params = KickStartParamsBuilder.instance.buildCommandLineParams(kickStartParams)
-        log.info "Using params = $params"
+        logger.info "Using params = $params"
 
         ClassLoader classLoader = Thread.currentThread().contextClassLoader
         Class kickStart = Class.forName('com.google.appengine.tools.KickStart', true, classLoader)
@@ -113,9 +113,7 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
         getWarDirectory() ?: getExplodedWarDirectory()
     }
 
-    @Slf4j
     private class KickStartRunnable implements Runnable {
-
         @Override
         void run() {
             InputStream systemInOriginal = System.in
@@ -147,7 +145,7 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
         private class OutStreamHandler implements StreamOutputHandler {
             @Override
             void handleLine(String line) {
-                log.info line
+                logger.info line
                 checkServerStartupProgress(line)
             }
         }
@@ -155,7 +153,7 @@ class GaeRunTask extends AbstractGaeTask implements Explodable {
         private class ErrStreamHandler implements StreamOutputHandler {
             @Override
             void handleLine(String line) {
-                log.error line
+                logger.error line
                 checkServerStartupProgress(line)
             }
         }

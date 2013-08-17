@@ -23,6 +23,7 @@ import org.gradle.api.plugins.gae.task.appcfg.GaeAppConfigConvention
  * @author Benjamin Muschko
  */
 class GaePluginConvention {
+    String httpAddress
     Integer httpPort = 8080
     Integer stopPort = 8081
     String stopKey
@@ -54,6 +55,12 @@ class GaePluginConvention {
     def logs(Closure closure) {
         closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure.delegate = appCfg.logs
+        closure()
+    }
+
+    def update(Closure closure) {
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure.delegate = appCfg.update
         closure()
     }
 }

@@ -22,7 +22,7 @@ example on how to retrieve it from Maven Central:
         }
 
         dependencies {
-            classpath 'org.gradle.api.plugins:gradle-gae-plugin:0.7.6'
+            classpath 'org.gradle.api.plugins:gradle-gae-plugin:0.8.1'
         }
     }
 
@@ -33,7 +33,7 @@ convention property `downloadSdk` to `true`. This option requires you to specify
 the configuration `gaeSdk`.
 
     dependencies {
-        gaeSdk 'com.google.appengine:appengine-java-sdk:1.6.6'
+        gaeSdk 'com.google.appengine:appengine-java-sdk:1.7.3'
     }
 
 ## Tasks
@@ -64,8 +64,8 @@ web application directory each time you run this task. This behavior can be chan
 * `gaeUpdateDos`: Updates the DoS protection configuration for the app, based on the dos.xml file.
 * `gaeUpdateIndexes`: Updates datastore indexes in App Engine to include newly added indexes.
 * `gaeUpdateQueues`: Updates the task queue configuration (queue.xml) in App Engine.
-* `gaeUpload`: Uploads files for an application given the application's root directory. The application ID and version are taken from the appengine-web.xml file.
-* `gaeUploadAll`: Uploads your application to App Engine and updates all backends by running the task `gaeUpload` and `gaeUpdateAllBackends`.
+* `gaeUpdate`: Uploads files for an application given the application's root directory. The application ID and version are taken from the appengine-web.xml file.
+* `gaeUpdateAll`: Uploads your application to App Engine and updates all backends by running the task `gaeUpdate` and `gaeUpdateAllBackends`.
 * `gaeVacuumIndexes`: Deletes unused indexes in App Engine server.
 * `gaeVersion`: Prints detailed version information about the SDK, Java and the operating system.
 
@@ -78,6 +78,7 @@ The GAE plugin uses the same layout as the [Gradle War plugin](http://gradle.org
 
 The GAE plugin defines the following convention properties in the `gae` closure:
 
+* `httpAddress`: The IP address for the local development server (if server is to be accessed from network). Default is localhost.
 * `httpPort`: The TCP port which local development server should listen for HTTP requests on (defaults to 8080).
 * `stopPort`: The TCP port which local development server should listen for admin requests on (defaults to 8081).
 * `stopKey`: The key to pass to local development server when requesting it to stop (defaults to null).
@@ -98,6 +99,7 @@ Within `gae` you can define optional properties in a closure named `appcfg`:
 If omitted and no cookie is stored from a previous use of the command, the command will prompt for this value.
 * `server`: The App Engine server hostname (defaults to appengine.google.com).
 * `host`: The hostname of the local machine for use with remote procedure calls.
+* `noCookies`: Do not store the administrator sign-in credentials. Prompt for a password every time. (or go through the OAuth2 flow when the `oauth2` option is used).
 * `passIn`: Do not store the administrator sign-in credentials as a cookie; prompt for a password every time. If the property
 `password` was provided then this value will always be true.
 * `password`: The password in plain text to be used whenever a task requires one. The password is only applied if the `email`
@@ -107,7 +109,7 @@ convention property was provided also. Alternatively, you can set the password i
 * `httpsProxy`: Use the given HTTPS proxy to contact App Engine, when using HTTPS. If `httpProxy` is given but `httpsProxy`
 is not, both HTTP and HTTPS requests will use the given proxy.
 * `changing` : notifies plugin that `appengine-web.xml` file may be modified during the build process
-
+* `oauth2`: Use OAuth2 authentication instead of password-based authentication.
 The task `gaeDownloadApp` requires you to at least define the application ID and directory to write the files to. Define the tasks' properties in the
 closure `app`:
 
@@ -127,6 +129,10 @@ will be retrieved (defaults to 1 (INFO)).
 requested data, it does not guarantee the file won't contain duplicate error messages. If this argument is not specified,
 the plugin will overwrite the log output file.
 * `outputFile`: The file the logs get written to.
+
+The task `gaeUpdate` allows you to specify upload specific settings. Define the tasks' properties in the closure `update`:
+
+* `useJava7`: Java 7 compatibility flag (default to `false` if not set). This feature will require a App Engine SDK of >= 1.7.3.
 
 ### Example
 

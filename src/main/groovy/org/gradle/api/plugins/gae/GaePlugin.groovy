@@ -15,22 +15,22 @@
  */
 package org.gradle.api.plugins.gae
 
-import groovy.util.logging.Slf4j
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.execution.TaskExecutionGraph
+import org.gradle.api.plugins.*
+import org.gradle.api.plugins.gae.task.*
+import org.gradle.api.plugins.gae.task.appcfg.*
+import org.gradle.api.plugins.gae.task.appcfg.backends.*
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.testing.Test
 import org.gradle.plugins.ide.eclipse.EclipsePlugin
 import org.gradle.plugins.ide.idea.IdeaPlugin
-import org.gradle.api.plugins.*
-import org.gradle.api.plugins.gae.task.*
-import org.gradle.api.plugins.gae.task.appcfg.*
-import org.gradle.api.plugins.gae.task.appcfg.backends.*
+
 import static org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
 
 /**
@@ -38,7 +38,6 @@ import static org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
  *
  * @author Benjamin Muschko
  */
-@Slf4j
 class GaePlugin implements Plugin<Project> {
     static final String GAE_SDK_CONFIGURATION_NAME = 'gaeSdk'
     static final String GAE_GROUP = 'Google App Engine'
@@ -46,7 +45,7 @@ class GaePlugin implements Plugin<Project> {
     static final String GAE_RUN = 'gaeRun'
     static final String GAE_STOP = 'gaeStop'
     static final String GAE_ENHANCE = 'gaeEnhance'
-    static final String GAE_UPLOAD = 'gaeUpload'
+    static final String GAE_UPDATE = 'gaeUpdate'
     static final String GAE_ROLLBACK = 'gaeRollback'
     static final String GAE_UPDATE_INDEXES = 'gaeUpdateIndexes'
     static final String GAE_VACUUM_INDEXES = 'gaeVacuumIndexes'
@@ -66,7 +65,7 @@ class GaePlugin implements Plugin<Project> {
     static final String GAE_STOP_BACKEND = 'gaeStopBackend'
     static final String GAE_DELETE_BACKEND = 'gaeDeleteBackend'
     static final String GAE_CONFIGURE_BACKENDS = 'gaeConfigureBackends'
-    static final String GAE_UPLOAD_ALL = 'gaeUploadAll'
+    static final String GAE_UPDATE_ALL = 'gaeUpdateAll'
     static final String GAE_FUNCTIONAL_TEST = 'gaeFunctionalTest'
     static final String GRADLE_USER_PROP_PASSWORD = 'gaePassword'
     static final String STOP_PORT_CONVENTION_PARAM = 'stopPort'
@@ -101,7 +100,7 @@ class GaePlugin implements Plugin<Project> {
         configureGaeRun(project, gaePluginConvention, explodedWarDirectory)
         configureGaeStop(project, gaePluginConvention)
         configureGaeEnhance(project)
-        configureGaeUpload(project)
+        configureGaeUpdate(project, gaePluginConvention, explodedWarDirectory)
         configureGaeRollback(project)
         configureGaeUpdateIndexes(project)
         configureGaeVacuumIndexes(project)
@@ -122,7 +121,7 @@ class GaePlugin implements Plugin<Project> {
         configureGaeStopBackend(project)
         configureGaeDeleteBackend(project)
         configureGaeConfigureBackends(project)
-        configureGaeUploadAll(project)
+        configureGaeUpdateAll(project)
         configureGaeFunctionalTest(project, gaePluginConvention)
     }
 
@@ -136,7 +135,7 @@ class GaePlugin implements Plugin<Project> {
             }
         }
         catch(UnknownPluginException e) {
-            log.info 'FatJar plugin not installed.'
+            project.logger.info 'FatJar plugin not installed.'
         }
     }
 
@@ -197,6 +196,7 @@ class GaePlugin implements Plugin<Project> {
             gaeAppConfigTaskTemplate.conventionMapping.map('email') { gaePluginConvention.appCfg.email }
             gaeAppConfigTaskTemplate.conventionMapping.map('server') { gaePluginConvention.appCfg.server }
             gaeAppConfigTaskTemplate.conventionMapping.map('host') { gaePluginConvention.appCfg.host }
+            gaeAppConfigTaskTemplate.conventionMapping.map('noCookies') { gaePluginConvention.appCfg.noCookies }
             gaeAppConfigTaskTemplate.conventionMapping.map('passIn') { gaePluginConvention.appCfg.passIn }
             gaeAppConfigTaskTemplate.conventionMapping.map('password') {
                 // Password from gradle.properties takes precedence
@@ -204,6 +204,7 @@ class GaePlugin implements Plugin<Project> {
             }
             gaeAppConfigTaskTemplate.conventionMapping.map('httpProxy') { gaePluginConvention.appCfg.httpProxy }
             gaeAppConfigTaskTemplate.conventionMapping.map('httpsProxy') { gaePluginConvention.appCfg.httpsProxy }
+            gaeAppConfigTaskTemplate.conventionMapping.map('oauth2') { gaePluginConvention.appCfg.oauth2 }
             gaeAppConfigTaskTemplate.conventionMapping.map('changing') { gaePluginConvention.appCfg.changing }
             project.afterEvaluate {
                 if(gaePluginConvention.appCfg.changing){
@@ -244,6 +245,7 @@ class GaePlugin implements Plugin<Project> {
 
     private void configureGaeRun(Project project, GaePluginConvention gaePluginConvention, File explodedWarDirectory) {
         project.tasks.withType(GaeRunTask).whenTaskAdded { GaeRunTask gaeRunTask ->
+            gaeRunTask.conventionMapping.map('httpAddress') { gaePluginConvention.httpAddress }
             gaeRunTask.conventionMapping.map('httpPort') { gaePluginConvention.httpPort }
             gaeRunTask.conventionMapping.map(STOP_PORT_CONVENTION_PARAM) { gaePluginConvention.stopPort }
             gaeRunTask.conventionMapping.map(STOP_KEY_CONVENTION_PARAM) { gaePluginConvention.stopKey }
@@ -289,11 +291,17 @@ class GaePlugin implements Plugin<Project> {
         }
     }
 
-    private void configureGaeUpload(Project project) {
+
+    private void configureGaeUpdate(Project project, GaePluginConvention gaePluginConvention, File explodedWarDirectory) {
+        project.tasks.withType(GaeUpdateTask).whenTaskAdded { GaeUpdateTask gaeUpdateTask ->
+            gaeUpdateTask.conventionMapping.map(EXPLODED_WAR_DIR_CONVENTION_PARAM) { explodedWarDirectory }
+            gaeUpdateTask.conventionMapping.map('useJava7') { gaePluginConvention.appCfg.update.useJava7 }
+        }
+
         GaeUploadTask gaeUploadTask = project.tasks.add(GAE_UPLOAD, GaeUploadTask)
         gaeUploadTask.description = 'Uploads your application to App Engine.'
         gaeUploadTask.group = GAE_GROUP
-        gaeUploadTask.dependsOn project.gaeExplodeWar
+        gaeUpdateTask.dependsOn project.gaeExplodeWar
     }
 
     private void configureGaeRollback(Project project) {
@@ -441,11 +449,11 @@ class GaePlugin implements Plugin<Project> {
         gaeConfigureBackendsTask.conventionMapping.map('setting') { project.property(SETTING_PROJECT_PROPERTY) }
     }
 
-    private void configureGaeUploadAll(Project project) {
-        Task gaeUploadAllTask = project.tasks.add(GAE_UPLOAD_ALL)
-        gaeUploadAllTask.description = 'Uploads your application to App Engine and updates all backends.'
-        gaeUploadAllTask.group = GAE_GROUP
-        gaeUploadAllTask.dependsOn project.gaeUpload, project.gaeUpdateAllBackends
+    private void configureGaeUpdateAll(Project project) {
+        Task gaeUpdateAllTask = project.tasks.add(GAE_UPDATE_ALL)
+        gaeUpdateAllTask.description = 'Updates your application and all backends on App Engine.'
+        gaeUpdateAllTask.group = GAE_GROUP
+        gaeUpdateAllTask.dependsOn project.gaeUpdate, project.gaeUpdateAllBackends
     }
 
     private void configureGaeFunctionalTest(Project project, GaePluginConvention convention) {

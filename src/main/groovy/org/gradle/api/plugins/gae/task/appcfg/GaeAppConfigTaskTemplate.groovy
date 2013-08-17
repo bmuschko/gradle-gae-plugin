@@ -34,12 +34,14 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask implements Expl
     String email
     String server
     String host
+    Boolean noCookies
     Boolean passIn
     String password
     String httpProxy
     String httpsProxy
     Boolean changing
     File explodedWarDirectory
+    Boolean oauth2
 
     @Override
     void executeTask() {
@@ -65,12 +67,12 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask implements Expl
 
     void runAppConfig() {
         try {
-            log.info startLogMessage()
+            logger.info startLogMessage()
 
             def params = []
             addCommonParams(params)
             params.addAll getParams()
-            log.info "Using params = $params"
+            logger.info "Using params = $params"
 
             ClassLoader classLoader = Thread.currentThread().contextClassLoader
             def appCfg = classLoader.loadClass('com.google.appengine.tools.admin.AppCfg')
@@ -80,7 +82,7 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask implements Expl
             throw new GradleException(errorLogMessage(), e)
         }
         finally {
-            log.info finishLogMessage()
+            logger.info finishLogMessage()
         }
     }
 
@@ -97,6 +99,10 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask implements Expl
             params << "--host=${getHost()}"
         }
 
+        if(getNoCookies()) {
+            params << '--no_cookies'
+        }
+
         if(getPassIn() || getPassword()) {
             params << '--passin'
         }
@@ -108,6 +114,11 @@ abstract class GaeAppConfigTaskTemplate extends GaeWebAppDirTask implements Expl
         if(getHttpsProxy()) {
             params << "--proxy_https=${getHttpsProxy()}"
         }
+
+        if(getOauth2()) {
+            params << '--oauth2'
+        }
+
     }
 
     private class AppConfigRunnable implements Runnable {

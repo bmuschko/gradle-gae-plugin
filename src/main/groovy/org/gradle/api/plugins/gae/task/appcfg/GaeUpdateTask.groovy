@@ -20,31 +20,40 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskInputs;
 
 /**
- * Google App Engine task uploading your application to the server.
+ * Google App Engine task updating your application on the server.
  *
  * @see <a href="http://code.google.com/appengine/docs/java/tools/uploadinganapp.html#Uploading_the_App">Documentation</a>
  * @author Benjamin Muschko
  */
-class GaeUploadTask extends GaeAppConfigTaskTemplate {
+class GaeUpdateTask extends GaeAppConfigTaskTemplate implements Explodable {
     static final String COMMAND = 'update'
+    @InputDirectory File explodedWarDirectory
+    Boolean useJava7
 
     @Override
     String startLogMessage() {
-        'Starting upload process...'
+        'Starting update process...'
     }
 
     @Override
     String errorLogMessage() {
-        'An error occurred uploading the application to App Engine.'
+        'An error occurred updating the application on App Engine.'
     }
 
     @Override
     String finishLogMessage() {
-        'Finished uploading process.'
+        'Finished updating process.'
     }
 
     @Override
     List getParams() {
-        ['--enable_jar_splitting', COMMAND, getExplodedWarDirectory().canonicalPath]
+        def params = ['--enable_jar_splitting']
+
+        if(getUseJava7()) {
+            params << '--use_java7'
+        }
+
+        params.addAll([COMMAND, getExplodedWarDirectory().canonicalPath])
+        params
     }
 }
