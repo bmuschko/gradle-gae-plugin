@@ -298,7 +298,7 @@ class GaePlugin implements Plugin<Project> {
             gaeUpdateTask.conventionMapping.map('useJava7') { gaePluginConvention.appCfg.update.useJava7 }
         }
 
-        GaeUploadTask gaeUploadTask = project.tasks.add(GAE_UPLOAD, GaeUploadTask)
+        GaeUpdateTask gaeUploadTask = project.tasks.add(GAE_UPLOAD, GaeUploadTask)
         gaeUploadTask.description = 'Uploads your application to App Engine.'
         gaeUploadTask.group = GAE_GROUP
         gaeUpdateTask.dependsOn project.gaeExplodeWar
