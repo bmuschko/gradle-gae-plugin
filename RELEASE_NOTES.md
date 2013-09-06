@@ -1,9 +1,21 @@
-### Version 0.9 (June 11, 2013)
+### Version 0.10 (September 6, 2013)
 * Added support for `version` and `appid` to override any other version or appid specified in appengine xml
 * Moved `version` and `appid` properties from `app` closure into `appcfg` closure
 * Renamed `app` closure to `download`
 
+### Version 0.9 (August 18, 2013)
+
+* Fixed deprecation warnings.
+* Upgrade to Gradle Nexus plugin 0.3 and Gradle FatJar plugin 0.2.
+* Upgrade to Gradle Wrapper 1.7.
+
+### Version 0.8.1 (August 4, 2013)
+
+* Expose convention property for setting the host name of development server - [Issue 52](https://github.com/bmuschko/gradle-gae-plugin/issues/52).
+>>>>>>> 58d0ddcd121c8cca1a054cce97e45b56ab098e5b
+
 ### Version 0.8 (December 9, 2012)
+
 * Expose convention property for setting Java 7 compatibility - [Issue 33](https://github.com/bmuschko/gradle-gae-plugin/issues/33).
 * Expose convention properties for OAuth2 and no cookies flags - [Issue 35](http://github.com/bmuschko/gradle-gae-plugin/issues/35).
 * Renamed tasks `gaeUpload`/`gaeUploadAll` to `gaeUpdate`/`gaeUpdateAll` - [Issue 36](http://github.com/bmuschko/gradle-gae-plugin/issues/36). _Note_: The old task names
