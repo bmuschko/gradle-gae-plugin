@@ -1,7 +1,7 @@
 ### Version 0.9 (June 11, 2013)
-* Added support for version and appid to override any other version or appid specified in appengine xml
-* Moved version and appid properties from app closure into appcfg closure
-* Renamed app closure to download
+* Added support for `version` and `appid` to override any other version or appid specified in appengine xml
+* Moved `version` and `appid` properties from `app` closure into `appcfg` closure
+* Renamed `app` closure to `download`
 
 ### Version 0.8 (December 9, 2012)
 * Expose convention property for setting Java 7 compatibility - [Issue 33](https://github.com/bmuschko/gradle-gae-plugin/issues/33).
