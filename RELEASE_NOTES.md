@@ -12,7 +12,6 @@
 ### Version 0.8.1 (August 4, 2013)
 
 * Expose convention property for setting the host name of development server - [Issue 52](https://github.com/bmuschko/gradle-gae-plugin/issues/52).
->>>>>>> 58d0ddcd121c8cca1a054cce97e45b56ab098e5b
 
 ### Version 0.8 (December 9, 2012)
 
