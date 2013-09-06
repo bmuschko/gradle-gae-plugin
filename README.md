@@ -143,14 +143,15 @@ The task `gaeUpdate` allows you to specify upload specific settings. Define the 
         appcfg {
             email = 'benjamin.muschko@gmail.com'
             passIn = true
+            id = 'myAppId'
 
             logs {
                 severity = 1
                 outputFile = file('mylogs.txt')
             }
 
-            app {
-                id = 'sample-app'
+            download {
+                outputDirectory = 'build/myLocation'
             }
         }
     }
