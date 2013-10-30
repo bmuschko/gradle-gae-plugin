@@ -6,7 +6,7 @@ def compatibilityVersion = 1.5
 sourceCompatibility = compatibilityVersion
 targetCompatibility = compatibilityVersion
 group = 'org.gradle.api.plugins'
-version = '0.9'
+version = '0.10'
 
 buildscript {
     repositories {
@@ -92,6 +92,10 @@ modifyPom {
             developer {
                 id 'erdi'
                 name 'Marcin Erdmann'
+            }
+            developer {
+                id 'bfschuil'
+                name 'Ben Schuiling'
             }
         }
     }

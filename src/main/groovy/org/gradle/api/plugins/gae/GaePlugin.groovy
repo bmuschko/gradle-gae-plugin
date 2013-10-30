@@ -196,6 +196,8 @@ class GaePlugin implements Plugin<Project> {
             gaeAppConfigTaskTemplate.conventionMapping.map('httpProxy') { gaePluginConvention.appCfg.httpProxy }
             gaeAppConfigTaskTemplate.conventionMapping.map('httpsProxy') { gaePluginConvention.appCfg.httpsProxy }
             gaeAppConfigTaskTemplate.conventionMapping.map('oauth2') { gaePluginConvention.appCfg.oauth2 }
+            gaeAppConfigTaskTemplate.conventionMapping.map('id') { gaePluginConvention.appCfg.id }
+            gaeAppConfigTaskTemplate.conventionMapping.map('version') { gaePluginConvention.appCfg.version }
         }
     }
 
@@ -348,9 +350,9 @@ class GaePlugin implements Plugin<Project> {
         GaeDownloadAppTask gaeDownloadAppTask = project.tasks.create(GAE_DOWNLOAD_APP, GaeDownloadAppTask)
         gaeDownloadAppTask.description = 'Retrieves the most current version of your application.'
         gaeDownloadAppTask.group = GAE_GROUP
-        gaeDownloadAppTask.conventionMapping.map('appId') { gaePluginConvention.appCfg.app.id }
-        gaeDownloadAppTask.conventionMapping.map('appVersion') { gaePluginConvention.appCfg.app.version }
-        gaeDownloadAppTask.conventionMapping.map('outputDirectory') { gaePluginConvention.appCfg.app.outputDirectory ?: downloadedAppDirectory }
+        gaeDownloadAppTask.conventionMapping.map('appId') { gaePluginConvention.appCfg.id }
+        gaeDownloadAppTask.conventionMapping.map('appVersion') { gaePluginConvention.appCfg.version }
+        gaeDownloadAppTask.conventionMapping.map('outputDirectory') { gaePluginConvention.appCfg.download.outputDirectory ?: downloadedAppDirectory }
     }
 
     /**

@@ -1,3 +1,8 @@
+### Version 0.10 (September 6, 2013)
+* Added support for `version` and `appid` to override any other version or appid specified in appengine xml
+* Moved `version` and `appid` properties from `app` closure into `appcfg` closure
+* Renamed `app` closure to `download`
+
 ### Version 0.9 (August 18, 2013)
 
 * Fixed deprecation warnings.
