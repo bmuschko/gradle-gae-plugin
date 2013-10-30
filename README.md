@@ -5,7 +5,7 @@
 
 <table border="1">
     <tr>
-        <td>The development of this plugin has been taken over by Google. Please refer to its new GitHub repository <a href="https://github.com/GoogleCloudPlatform/gradle-appengine-plugin">GoogleCloudPlatform/gradle-appengine-plugin</a>.</td>
+        <td>The development of this plugin has been taken over by Google. Please refer to its new GitHub repository <a href="https://github.com/GoogleCloudPlatform/gradle-appengine-plugin">GoogleCloudPlatform/gradle-appengine-plugin</a>. Development on this repository is discontinued.</td>
     </tr>
 </table>
 
