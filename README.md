@@ -3,7 +3,11 @@
 ![Google App Engine Logo](https://developers.google.com/appengine/images/appengine_lowres.png)
 
 
-| The development of this plugin has been taken over by Google. Please refer to its new GitHub repository [GoogleCloudPlatform/gradle-appengine-plugin](https://github.com/GoogleCloudPlatform/gradle-appengine-plugin). |
+<table border="1">
+    <tr>
+        <td>The development of this plugin has been taken over by Google. Please refer to its new GitHub repository [GoogleCloudPlatform/gradle-appengine-plugin](https://github.com/GoogleCloudPlatform/gradle-appengine-plugin).</td>
+    </tr>
+</table>
 
 The plugin provides tasks for uploading, downloading, running and managing [Google App Engine](http://code.google.com/appengine/)
 (GAE) projects in any given Gradle build. It extends the War plugin.
